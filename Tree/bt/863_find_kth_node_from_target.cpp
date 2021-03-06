@@ -1,5 +1,124 @@
-// #include <bits/stdc++.h>
-// using namespace std;
+//IMPORTANT QUESTION
+
+#include <bits/stdc++.h>
+using namespace std;
+
+
+struct TreeNode{
+ int val;
+ TreeNode*left;
+ TreeNode*right;
+ TreeNode(int val)
+ {
+    this->val=val;
+    this->left=nullptr;
+    this->right=nullptr;
+ }
+};
+//Time: O(n)
+//from a node we can print K downwards
+void printKdown(TreeNode* root,int k,TreeNode* block,vector<int>&ans)
+{
+    if(root==nullptr || k<0 || root==block) return;
+    if(k==0)
+    {
+        ans.push_back(root->val);
+        return;
+    }
+
+    printKdown(root->left,k-1,block,ans);
+    printKdown(root->right,k-1,block,ans);
+    return;
+}
+
+//now we take node to root path and at every node in that vector, we will print k nodes down from there
+// also blocking from where we have come
+
+bool find_node_to_root_path(TreeNode* node,TreeNode* k,vector<TreeNode*>&v)
+{
+    if(node==nullptr)
+    return false;
+
+    if(node==k)
+    {
+        v.push_back(node);
+        return true;
+    }
+
+    bool left=find_node_to_root_path(node->left,k,v);
+    bool right=find_node_to_root_path(node->right,k,v);
+
+    if(left || right)
+     v.push_back(node);
+    return left||right;
+}
+
+vector<int> distanceK(TreeNode* root, TreeNode* target, int k) {
+{
+    //ans
+    vector<int>ans;
+
+    if(root==nullptr) return ans;
+    vector<TreeNode*> list1;
+    
+    //contains node to root path
+    find_node_to_root_path(root,target,list1);
+    
+    //block node
+    TreeNode* block=nullptr;
+    
+    printKdown(list1[0],k,block,ans);
+
+    
+    //tranversing
+    for(int i=1;i<list1.size();i++)
+    {
+        block=list1[i-1];
+        printKdown(list1[i],k-i,block,ans);
+    } 
+    return ans;
+}
+
+//Optimised: To not find root to node path
+//Avoiding that space and time:O(n)
+
+
+int distanceatK1(TreeNode*root,TreeNode* target,int k,vector<int>&ans){
+    if(root==nullptr )
+    {
+        return -1;
+    }
+    if(root==target)
+    {
+        block=nullptr;
+        printKdown(root,k,nullptr,ans);
+        return 1;
+    }
+    int left=distanceatK(root->left,target,k,ans);
+    if(left!=-1)
+    {
+      printKdown(root,k-left,root->left,ans);
+      return left+1;
+    }
+    bool right=distanceatK(root->right,target,k,ans);
+    if(right!=-1)
+    {
+      printKdown(root,k-right,root->right,ans);
+      return right+1;
+    }
+    return -1;
+}
+
+
+vector<int> distanceK1(TreeNode* root, TreeNode* target, int k) 
+{
+        vector<int> ans;
+        int t=distanceatK1(root,target,k,ans);
+        return ans;
+
+}
+
+
 // struct node{
 //     int data;
 //     int depth;
